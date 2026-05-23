@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cota PCD 04/2026 · Hub RH</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8FAFC;color:#0F172A}
+.page-header{background:#221C46;color:#fff;padding:20px 24px 16px}
+.page-header h1{font-size:1.25rem;font-weight:700;letter-spacing:-0.01em}
+.page-header .sub{font-size:0.85rem;opacity:.75;margin-top:2px}
+.summary-bar{display:flex;gap:12px;padding:16px 24px;background:#fff;border-bottom:1px solid #E2E8F0;flex-wrap:wrap}
+.s-chip{display:flex;align-items:center;gap:6px;font-size:0.82rem;padding:4px 10px;border-radius:20px;font-weight:600}
+.s-ok{background:#F0FDF4;color:#16A34A}
+.s-alerta{background:#FFFBEB;color:#D97706}
+.s-critico{background:#FEF2F2;color:#DC2626}
+.s-isento{background:#EFF6FF;color:#2563EB}
+.s-total{background:#F1F5F9;color:#475569}
+.s-pcds{background:#F5F3FF;color:#7C3AED}
+.tab-bar{display:flex;gap:0;border-bottom:2px solid #E2E8F0;background:#fff;padding:0 24px;overflow-x:auto}
+.tab-btn{padding:12px 18px;border:none;background:none;cursor:pointer;font-size:0.9rem;font-weight:500;color:#64748B;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn.active{color:#221C46;border-bottom-color:#221C46;font-weight:700}
+.tab-btn:hover:not(.active){color:#334155}
+.tab-content{display:none;padding:20px 24px}
+.tab-content.active{display:block}
+.card{border:1px solid #E2E8F0;border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+.card-title{font-weight:700;font-size:.95rem;color:#0F172A}
+.card-sub{color:#475569;font-size:.85rem}
+.card-code{color:#94A3B8;font-size:.78rem}
+.card-status{font-weight:700;font-size:.88rem;white-space:nowrap;padding:3px 10px;border-radius:12px}
+.st-ok{background:#F0FDF4;color:#16A34A}
+.st-alerta{background:#FFFBEB;color:#D97706}
+.st-critico{background:#FEF2F2;color:#DC2626}
+.st-isento{background:#EFF6FF;color:#2563EB}
+.metrics{display:flex;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff}
+.metric{flex:1;padding:10px 6px;border-right:1px solid #E2E8F0;text-align:center;min-width:0}
+.metric:last-child{border-right:none}
+.m-label{font-size:.65rem;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.m-value{font-size:1.15rem;font-weight:700;line-height:1.3}
+.m-sub{font-size:.65rem;color:#94A3B8;margin-top:1px}
+.card-footer{margin-top:8px;font-size:.72rem;color:#94A3B8}
+.tipo-grid{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.tipo-card{border-radius:8px;padding:10px 14px;text-align:center;min-width:90px;flex:1}
+.tipo-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;opacity:.8}
+.tipo-val{font-size:1.5rem;font-weight:700;line-height:1.2}
+.tipo-pct{font-size:.72rem;opacity:.7}
+.progress-bar{margin-top:6px;height:4px;border-radius:2px;background:rgba(0,0,0,.1)}
+.progress-fill{height:4px;border-radius:2px}
+.search-box{width:100%;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:.9rem;margin-bottom:12px;outline:none}
+.search-box:focus{border-color:#221C46;box-shadow:0 0 0 3px rgba(34,28,70,.1)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{background:#221C46;color:#fff;padding:9px 12px;text-align:left;font-weight:600;font-size:.8rem}
+td{padding:8px 12px;border-bottom:1px solid #F1F5F9}
+tr:hover td{background:#F8FAFC}
+.sel{width:100%;padding:8px 12px;border:1px solid #E2E8F0;border-radius:8px;font-size:.9rem;margin-bottom:16px;outline:none;background:#fff;cursor:pointer}
+.chart-wrap{position:relative;margin-bottom:24px}
+.chart-title{font-size:.9rem;font-weight:600;color:#334155;margin-bottom:10px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:640px){
+.metrics{flex-wrap:wrap}
+.metric{min-width:calc(33% - 4px)}
+.summary-bar{gap:8px}
+.charts-grid{grid-template-columns:1fr}
+.card-header{flex-direction:column}
+}
+.footer{text-align:center;padding:20px;font-size:.75rem;color:#94A3B8;border-top:1px solid #E2E8F0;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Cota Social — PCD e Aprendizes</h1>
+  <div class="sub">Competência 04/2026 · Gerado em 23/05/2026 às 21:34</div>
+</div>
+
+<div class="summary-bar">
+  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
+  <span class="s-chip s-ok">✅ 1 OK</span>
+  
+  
+  <span class="s-chip s-isento">🔵 7 Isento</span>
+  <span class="s-chip s-pcds">👥 25 PCDs contratados</span>
+  
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('resultado')">📊 Resultado por Competência</button>
+  <button class="tab-btn" onclick="showTab('lista')">👥 Lista de PCDs</button>
+  <button class="tab-btn" onclick="showTab('historico')">📈 Histórico</button>
+</div>
+
+<!-- Tab: Resultado -->
+<div id="tab-resultado" class="tab-content active">
+
+<div class="card" style="background:#F0FDF4">
+  <div class="card-header">
+    <div>
+      <span class="card-title">GA Educação LTDA</span>
+      <span class="card-sub"> · GA Educação</span>
+      <span class="card-code"> (cód. 1000)</span>
+    </div>
+    <span class="card-status st-ok">✅ OK</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">672</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">617</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#16A34A">4%</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">25</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">25</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>8</b> &nbsp;·&nbsp;
+    Aprendizes: <b>16</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>6</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">GA Educação LTDA</span>
+      <span class="card-sub"> · GA Educação SP</span>
+      <span class="card-code"> (cód. 1001)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">3</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">3</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>0</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">GA Educação LTDA</span>
+      <span class="card-sub"> · GA Educação CL</span>
+      <span class="card-code"> (cód. 1002)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">11</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">10</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>1</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>0</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">Artmed Panamericana Editora Ltda</span>
+      <span class="card-sub"> · Artmed</span>
+      <span class="card-code"> (cód. 2000)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">20</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">20</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>0</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">Artmed Panamericana Editora Ltda</span>
+      <span class="card-sub"> · Artmed CL</span>
+      <span class="card-code"> (cód. 2001)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">2</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>0</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">MDS Cursos e Concursos Ltda</span>
+      <span class="card-sub"> · MDS Cursos e Concursos Ltda</span>
+      <span class="card-code"> (cód. 3000)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">2</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>0</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">Algetec Tecnologia Industria e Comercio</span>
+      <span class="card-sub"> · Algetec Tecnologia Industria e Comercio</span>
+      <span class="card-code"> (cód. 4000)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">39</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">33</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>5</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>1</b>
+  </div>
+</div>
+
+<div class="card" style="background:#EFF6FF">
+  <div class="card-header">
+    <div>
+      <span class="card-title">Saber em Rede Prestação de Serviços</span>
+      <span class="card-sub"> · Saber em Rede Prestação de Serviços</span>
+      <span class="card-code"> (cód. 5000)</span>
+    </div>
+    <span class="card-status st-isento">🔵 Isento</span>
+  </div>
+  <div class="metrics">
+    <div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">1</div></div>
+    <div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">excl. especiais</div></div>
+    <div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#2563EB">ISENTO</div></div>
+    <div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div>
+    <div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div>
+    <div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div>
+  </div>
+  <div class="card-footer">
+    Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp;
+    Aprendizes: <b>0</b> &nbsp;·&nbsp;
+    Pró-Labore/Dir.: <b>1</b>
+  </div>
+</div>
+</div>
+
+<!-- Tab: Lista -->
+<div id="tab-lista" class="tab-content">
+  <h3 style="font-size:.95rem;font-weight:700;color:#0F172A;margin-bottom:14px">
+    25 PCD(s) ativos · Competência 04/2026
+  </h3>
+  <div class="tipo-grid"><div class="tipo-card" style="background:#EFF6FF;border:1px solid #3B82F640"><div class="tipo-label" style="color:#3B82F6">Física</div><div class="tipo-val" style="color:#3B82F6">11</div><div class="tipo-pct" style="color:#3B82F6">44%</div><div class="progress-bar"><div class="progress-fill" style="background:#3B82F6;width:44%"></div></div></div><div class="tipo-card" style="background:#F5F3FF;border:1px solid #8B5CF640"><div class="tipo-label" style="color:#8B5CF6">Mental</div><div class="tipo-val" style="color:#8B5CF6">7</div><div class="tipo-pct" style="color:#8B5CF6">28%</div><div class="progress-bar"><div class="progress-fill" style="background:#8B5CF6;width:28%"></div></div></div><div class="tipo-card" style="background:#F0FDF4;border:1px solid #10B98140"><div class="tipo-label" style="color:#10B981">Auditiva</div><div class="tipo-val" style="color:#10B981">4</div><div class="tipo-pct" style="color:#10B981">16%</div><div class="progress-bar"><div class="progress-fill" style="background:#10B981;width:16%"></div></div></div><div class="tipo-card" style="background:#FEF2F2;border:1px solid #EF444440"><div class="tipo-label" style="color:#EF4444">Visual</div><div class="tipo-val" style="color:#EF4444">3</div><div class="tipo-pct" style="color:#EF4444">12%</div><div class="progress-bar"><div class="progress-fill" style="background:#EF4444;width:12%"></div></div></div></div>
+  <input class="search-box" type="text" id="search-lista" placeholder="Buscar por nome, cargo, tipo..." oninput="filtrarLista()">
+  <div style="overflow-x:auto">
+  <table id="tbl-lista">
+    <thead>
+      <tr>
+        <th>Matrícula</th><th>Colaborador</th><th>Tipo de Deficiência</th>
+        <th>Cargo</th><th>Empresa</th><th>Estabelecimento</th>
+      </tr>
+    </thead>
+    <tbody id="lista-body"></tbody>
+  </table>
+  </div>
+  <p id="lista-count" style="font-size:.75rem;color:#94A3B8;margin-top:8px"></p>
+</div>
+
+<!-- Tab: Histórico -->
+<div id="tab-historico" class="tab-content">
+  <div id="hist-empty" style="color:#64748B;font-size:.9rem;padding:20px 0">
+    Nenhum histórico disponível.
+  </div>
+  <div id="hist-content" style="display:none">
+    <select class="sel" id="emp-sel" onchange="renderCharts()">
+    </select>
+    <div class="charts-grid">
+      <div class="chart-wrap">
+        <div class="chart-title">PCDs contratados × Cota necessária</div>
+        <canvas id="chart-linha" height="220"></canvas>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Pendente por competência</div>
+        <canvas id="chart-pendente" height="220"></canvas>
+      </div>
+    </div>
+    <div id="tipo-wrap" class="chart-wrap" style="display:none">
+      <div class="chart-title">Composição por tipo de deficiência</div>
+      <canvas id="chart-tipo" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  Hub RH · Gerado em 23/05/2026 às 21:34 · Lei 8.213/91
+</div>
+
+<script>
+const LISTA = [{"Matrícula": "3536", "Colaborador": "ALINE CHAGAS PETILLO", "Cargo": "ASSISTENTE CONTÁBIL", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1438", "Colaborador": "ALINE DE SOUZA BARRETO", "Cargo": "ANALISTA DE REGISTRO ACADÊMICO", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1712", "Colaborador": "ALINE ROSA RODRIGUES", "Cargo": "ANALISTA DE PRODUCAO DE CONTEUDO", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1837", "Colaborador": "ARTHUR CASTANHARI", "Cargo": "ANALISTA DE INFRAESTRUTURA", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2848", "Colaborador": "BARBARA SILVA TELES DE MENEZES", "Cargo": "DESIGNER EDUCACIONAL", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3457", "Colaborador": "CAROLINE FONSECA DOS SANTOS", "Cargo": "ASSISTENTE FINANCEIRO", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3104", "Colaborador": "DEBORA REGINA DA SILVA", "Cargo": "ASSISTENTE DE COBRANÇA", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2003", "Colaborador": "ELIAS BRESSLER", "Cargo": "ESPECIALISTA DE TI", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2891", "Colaborador": "ESTEVAM MEDINA LEAL", "Cargo": "ASSISTENTE CONTÁBIL", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3030", "Colaborador": "EUGENIO FERREIRA BRAUNER", "Cargo": "COORDENADOR EDITORIAL I", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2892", "Colaborador": "EVELYN SERENA MOREIRA FERMINO", "Cargo": "ASSISTENTE DE OPERACOES", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2808", "Colaborador": "FERNANDA PERON SORANZO", "Cargo": "ANALISTA DE MARKETING", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "599", "Colaborador": "JOCEMAR DA LUZ IBARR", "Cargo": "ANALISTA FINANCEIRO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3430", "Colaborador": "JOICE ELIANE DORR", "Cargo": "ANALISTA DE RH", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2771", "Colaborador": "JONAS EDUARDO BAIERLE", "Cargo": "ASSISTENTE DE ATENDIMENTO II", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3554", "Colaborador": "JULIANA LESTA BRANCO", "Cargo": "ANALISTA DE PROJETOS", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2998", "Colaborador": "KARINA ANTONIO", "Cargo": "ANALISTA DE PRODUCAO DE CONTEUDO", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3492", "Colaborador": "LEONARDO SILVA DE AZEVEDO", "Cargo": "SUPERVISOR DE OPERAÇÕES", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3170", "Colaborador": "LEVY BEZERRA HOLANDA", "Cargo": "DESENVOLVEDOR FULL STACK", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2806", "Colaborador": "MATHEUS DE OLIVEIRA DE CARVALHO DA SILVA", "Cargo": "ANALISTA DE PROJETOS", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2031", "Colaborador": "RAISSA TENUTO DE MELLO", "Cargo": "ANALISTA DE DADOS", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3321", "Colaborador": "RAPHAELLA BIDART DA ROCHA", "Cargo": "ASSISTENTE DE COMPRAS", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1759", "Colaborador": "REVELINO NASCIMENTO DA SILVA", "Cargo": "ANALISTA CONTABIL", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1760", "Colaborador": "RONALDO SOUZA SBARDELOTTO", "Cargo": "ASSISTENTE DE VENDAS I", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "603", "Colaborador": "TIANE ISABELA GASS", "Cargo": "ASSISTENTE ADMINISTRATIVO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}];
+const HIST = {"GA Educação LTDA": {"labels": ["04/2026"], "pcds": [25], "cota": [25], "pendente": [0]}, "Artmed Panamericana Editora Ltda": {"labels": ["04/2026"], "pcds": [0], "cota": [0], "pendente": [0]}, "MDS Cursos e Concursos Ltda": {"labels": ["04/2026"], "pcds": [0], "cota": [0], "pendente": [0]}, "Algetec Tecnologia Industria e Comercio": {"labels": ["04/2026"], "pcds": [0], "cota": [0], "pendente": [0]}, "Saber em Rede Prestação de Serviços": {"labels": ["04/2026"], "pcds": [0], "cota": [0], "pendente": [0]}};
+const TIPO_HIST = {"GA Educação LTDA": {"tipos": ["Auditiva", "Física", "Mental", "Visual"], "labels": ["04/2026"], "datasets": {"Auditiva": [4], "Física": [11], "Mental": [7], "Visual": [3]}}};
+const EMPRESAS = ["Algetec Tecnologia Industria e Comercio", "Artmed Panamericana Editora Ltda", "GA Educação LTDA", "MDS Cursos e Concursos Ltda", "Saber em Rede Prestação de Serviços"];
+
+// ── Tab switching ─────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (id === 'historico') initHist();
+  if (id === 'lista') initLista();
+}
+
+// ── Lista ─────────────────────────────────────────────────────────────────────
+let listaInited = false;
+function initLista() {
+  if (listaInited) return;
+  listaInited = true;
+  renderLista(LISTA);
+}
+
+function renderLista(rows) {
+  const tbody = document.getElementById('lista-body');
+  tbody.innerHTML = rows.map(r =>
+    `<tr><td>${esc(r['Matrícula'])}</td><td>${esc(r['Colaborador'])}</td>
+     <td>${esc(r['Tipo de Deficiência'])}</td><td>${esc(r['Cargo'])}</td>
+     <td>${esc(r['Empresa'])}</td><td>${esc(r['Estabelecimento'])}</td></tr>`
+  ).join('');
+  document.getElementById('lista-count').textContent = rows.length + ' registro(s)';
+}
+
+function filtrarLista() {
+  const q = document.getElementById('search-lista').value.toLowerCase();
+  const filtered = LISTA.filter(r =>
+    Object.values(r).some(v => String(v).toLowerCase().includes(q))
+  );
+  renderLista(filtered);
+}
+
+function esc(v) {
+  return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── Histórico ─────────────────────────────────────────────────────────────────
+let chartLinha = null, chartPendente = null, chartTipo = null;
+let histInited = false;
+
+function initHist() {
+  if (histInited) return;
+  histInited = true;
+  if (!EMPRESAS.length) return;
+  document.getElementById('hist-empty').style.display = 'none';
+  document.getElementById('hist-content').style.display = 'block';
+  const sel = document.getElementById('emp-sel');
+  EMPRESAS.forEach(emp => {
+    const opt = document.createElement('option');
+    opt.value = emp;
+    opt.textContent = emp;
+    sel.appendChild(opt);
+  });
+  renderCharts();
+}
+
+const TIPO_COLORS = [
+  '#3B82F6','#8B5CF6','#10B981','#F59E0B','#EF4444','#6B7280','#EC4899','#14B8A6'
+];
+
+function renderCharts() {
+  const emp = document.getElementById('emp-sel').value;
+  const d = HIST[emp];
+  if (!d) return;
+
+  if (chartLinha) chartLinha.destroy();
+  chartLinha = new Chart(document.getElementById('chart-linha'), {
+    type: 'line',
+    data: {
+      labels: d.labels,
+      datasets: [
+        {label:'PCDs contratados', data:d.pcds, borderColor:'#3B82F6', backgroundColor:'rgba(59,130,246,.1)', tension:.3, fill:true},
+        {label:'Cota necessária', data:d.cota, borderColor:'#EF4444', backgroundColor:'rgba(239,68,68,.05)', borderDash:[5,3], tension:.3}
+      ]
+    },
+    options: {responsive:true, plugins:{legend:{position:'bottom'}}, scales:{y:{beginAtZero:true}}}
+  });
+
+  if (chartPendente) chartPendente.destroy();
+  chartPendente = new Chart(document.getElementById('chart-pendente'), {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [{
+        label:'Pendente', data:d.pendente,
+        backgroundColor: d.pendente.map(v => v > 2 ? '#FCA5A5' : v > 0 ? '#FDE68A' : '#BBF7D0'),
+        borderRadius: 4
+      }]
+    },
+    options: {responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}
+  });
+
+  const td = TIPO_HIST[emp];
+  const tipoWrap = document.getElementById('tipo-wrap');
+  if (td && td.tipos && td.tipos.length > 0) {
+    tipoWrap.style.display = 'block';
+    if (chartTipo) chartTipo.destroy();
+    chartTipo = new Chart(document.getElementById('chart-tipo'), {
+      type: 'bar',
+      data: {
+        labels: td.labels,
+        datasets: td.tipos.map((tipo, i) => ({
+          label: tipo,
+          data: td.datasets[tipo],
+          backgroundColor: TIPO_COLORS[i % TIPO_COLORS.length],
+          borderRadius: 2
+        }))
+      },
+      options: {
+        responsive: true,
+        plugins: {legend:{position:'bottom'}},
+        scales: {x:{stacked:true}, y:{stacked:true, beginAtZero:true}}
+      }
+    });
+  } else {
+    tipoWrap.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
