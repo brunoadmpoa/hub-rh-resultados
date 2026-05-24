@@ -24,11 +24,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .comp-sel{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:5px 11px;font-size:.88rem;cursor:pointer;outline:none}
 .comp-sel option{background:#221C46;color:#fff}
 /* ── Summary chips ───────────────────────────────── */
-.summary-bar{display:flex;gap:8px;padding:10px 20px;background:#fff;border-bottom:1px solid #E2E8F0;flex-wrap:wrap}
-.s-chip{display:flex;align-items:center;gap:4px;font-size:.78rem;padding:3px 9px;border-radius:20px;font-weight:600}
-.s-ok{background:#F0FDF4;color:#16A34A}.s-alerta{background:#FFFBEB;color:#D97706}
-.s-critico{background:#FEF2F2;color:#DC2626}.s-isento{background:#EFF6FF;color:#2563EB}
-.s-total{background:#F1F5F9;color:#475569}.s-pcds{background:#F5F3FF;color:#7C3AED}
 /* ── Tabs ────────────────────────────────────────── */
 .tab-bar{display:flex;border-bottom:2px solid #E2E8F0;background:#fff;padding:0 20px;overflow-x:auto}
 .tab-btn{padding:10px 14px;border:none;background:none;cursor:pointer;font-size:.86rem;font-weight:500;color:#64748B;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
@@ -102,43 +97,6 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
 <option value="01/2026">Competência 01/2026</option>
     </select>
   </div>
-  
-<div id="pcd-summary-04-2026" class="summary-bar">
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  <span class="s-chip s-ok">✅ 1 OK</span>
-  
-  
-  <span class="s-chip s-isento">🔵 7 Isento</span>
-  <span class="s-chip s-pcds">👥 25 PCDs</span>
-  
-</div>
-<div id="pcd-summary-03-2026" class="summary-bar" hidden>
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  <span class="s-chip s-ok">✅ 1 OK</span>
-  
-  
-  <span class="s-chip s-isento">🔵 7 Isento</span>
-  <span class="s-chip s-pcds">👥 26 PCDs</span>
-  
-</div>
-<div id="pcd-summary-02-2026" class="summary-bar" hidden>
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  
-  <span class="s-chip s-alerta">⚠️ 1 Alerta</span>
-  
-  <span class="s-chip s-isento">🔵 7 Isento</span>
-  <span class="s-chip s-pcds">👥 25 PCDs</span>
-  <span class="s-chip s-alerta">⚠️ 1 pendente(s)</span>
-</div>
-<div id="pcd-summary-01-2026" class="summary-bar" hidden>
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  
-  <span class="s-chip s-alerta">⚠️ 1 Alerta</span>
-  
-  <span class="s-chip s-isento">🔵 7 Isento</span>
-  <span class="s-chip s-pcds">👥 24 PCDs</span>
-  <span class="s-chip s-alerta">⚠️ 1 pendente(s)</span>
-</div>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTab('resultado',event)">📊 Resultado</button>
     <button class="tab-btn" onclick="showTab('lista',event)">👥 Lista de PCDs</button>
@@ -219,7 +177,7 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
       </div>
     </div>
   </div>
-  <div class="footer">Hub RH · Gerado em 24/05/2026 às 22:43 · Lei 8.213/91</div>
+  <div class="footer">Hub RH · Gerado em 24/05/2026 às 22:50 · Lei 8.213/91</div>
 </div>
 
 
@@ -231,25 +189,6 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
 <option value="03/2026">Competência 03/2026</option>
     </select>
   </div>
-  
-<div id="apr-summary-04-2026" class="summary-bar">
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  <span class="s-chip s-ok">✅ 1 OK</span>
-  <span class="s-chip s-alerta">⚠️ 2 Alerta</span>
-  <span class="s-chip s-critico">🔴 1 Crítico</span>
-  <span class="s-chip s-isento">🔵 4 Isento</span>
-  <span class="s-chip s-pcds">🎓 17 aprendizes</span>
-  <span class="s-chip s-alerta">⚠️ 13 pendente(s)</span>
-</div>
-<div id="apr-summary-03-2026" class="summary-bar" hidden>
-  <span class="s-chip s-total">🏢 8 estabelecimentos</span>
-  <span class="s-chip s-ok">✅ 1 OK</span>
-  <span class="s-chip s-alerta">⚠️ 2 Alerta</span>
-  <span class="s-chip s-critico">🔴 1 Crítico</span>
-  <span class="s-chip s-isento">🔵 4 Isento</span>
-  <span class="s-chip s-pcds">🎓 22 aprendizes</span>
-  <span class="s-chip s-alerta">⚠️ 8 pendente(s)</span>
-</div>
   <div class="tab-bar">
     <button class="tab-btn active" onclick="showTabApr('resultado',event)">📊 Resultado</button>
     <button class="tab-btn" onclick="showTabApr('lista',event)">👥 Lista de Aprendizes</button>
@@ -305,7 +244,7 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
       </div>
     </div>
   </div>
-  <div class="footer">Hub RH · Gerado em 24/05/2026 às 22:43 · Lei 10.097/2000</div>
+  <div class="footer">Hub RH · Gerado em 24/05/2026 às 22:50 · Lei 10.097/2000</div>
 </div>
 
 </div><!-- /.main-area -->
@@ -347,9 +286,6 @@ function mudarCompetenciaPcd(comp) {
   document.querySelectorAll('[id^="pcd-cards-"]').forEach(el => el.hidden = true);
   const c = document.getElementById('pcd-cards-' + sl);
   if (c) c.hidden = false;
-  document.querySelectorAll('[id^="pcd-summary-"]').forEach(el => el.hidden = true);
-  const s = document.getElementById('pcd-summary-' + sl);
-  if (s) s.hidden = false;
   atualizarLista();
 }
 
@@ -459,9 +395,6 @@ function mudarCompetenciaApr(comp) {
   document.querySelectorAll('[id^="apr-cards-"]').forEach(el => el.hidden = true);
   const c = document.getElementById('apr-cards-' + sl);
   if (c) c.hidden = false;
-  document.querySelectorAll('[id^="apr-summary-"]').forEach(el => el.hidden = true);
-  const s = document.getElementById('apr-summary-' + sl);
-  if (s) s.hidden = false;
   atualizarListaApr();
 }
 
