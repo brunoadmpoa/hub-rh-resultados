@@ -1,1 +1,465 @@
-<html><body style='font-family:sans-serif;padding:2rem'><p>Nenhum dado disponível.</p></body></html>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cota Social · Hub RH</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8FAFC;color:#0F172A}
+/* ── Sidebar layout ───────────────────────────────── */
+.app-shell{display:flex;min-height:100vh}
+.sidebar{width:200px;background:#221C46;color:#fff;flex-shrink:0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:18px 16px 12px;font-size:1rem;font-weight:800;letter-spacing:.02em;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:6px}
+.sidebar-logo span{opacity:.55;font-size:.7rem;font-weight:400;display:block;margin-top:2px}
+.nav-btn{display:flex;align-items:center;gap:9px;width:calc(100% - 12px);margin:1px 6px;padding:9px 12px;border:none;background:none;color:rgba(255,255,255,.72);cursor:pointer;font-size:.86rem;text-align:left;border-radius:6px;transition:background .15s,color .15s}
+.nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.nav-btn.active{background:rgba(255,255,255,.18);color:#fff;font-weight:700}
+.nav-icon{font-size:.95rem;width:18px;text-align:center;flex-shrink:0}
+.main-area{flex:1;min-width:0;overflow:hidden}
+/* ── Page header ─────────────────────────────────── */
+.page-header{background:#221C46;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.page-header h1{font-size:1.1rem;font-weight:700}
+.comp-sel{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:5px 11px;font-size:.88rem;cursor:pointer;outline:none}
+.comp-sel option{background:#221C46;color:#fff}
+/* ── Summary chips ───────────────────────────────── */
+/* ── Tabs ────────────────────────────────────────── */
+.tab-bar{display:flex;border-bottom:2px solid #E2E8F0;background:#fff;padding:0 20px;overflow-x:auto}
+.tab-btn{padding:10px 14px;border:none;background:none;cursor:pointer;font-size:.86rem;font-weight:500;color:#64748B;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s,border-color .15s}
+.tab-btn.active{color:#221C46;border-bottom-color:#221C46;font-weight:700}
+.tab-btn:hover:not(.active){color:#334155}
+.tab-content{display:none;padding:16px 20px}.tab-content.active{display:block}
+/* ── Cards ───────────────────────────────────────── */
+.card{border:1px solid #E2E8F0;border-radius:10px;padding:13px 16px;margin-bottom:10px}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;gap:8px}
+.card-title{font-weight:700;font-size:.93rem;color:#0F172A}
+.card-sub{color:#475569;font-size:.83rem}.card-code{color:#94A3B8;font-size:.73rem}
+.card-status{font-weight:700;font-size:.83rem;white-space:nowrap;padding:3px 9px;border-radius:12px}
+.st-ok{background:#F0FDF4;color:#16A34A}.st-alerta{background:#FFFBEB;color:#D97706}
+.st-critico{background:#FEF2F2;color:#DC2626}.st-isento{background:#EFF6FF;color:#2563EB}
+/* ── Metrics bar ─────────────────────────────────── */
+.metrics{display:flex;border:1px solid #E2E8F0;border-radius:8px;overflow:hidden;background:#fff}
+.metric{flex:1;padding:9px 5px;border-right:1px solid #E2E8F0;text-align:center;min-width:0}
+.metric:last-child{border-right:none}
+.m-label{font-size:.61rem;color:#64748B;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.m-value{font-size:1.05rem;font-weight:700;line-height:1.3}
+.m-sub{font-size:.61rem;color:#94A3B8;margin-top:1px}
+.card-footer{margin-top:7px;font-size:.7rem;color:#94A3B8}
+/* ── Lista ───────────────────────────────────────── */
+.search-box{width:100%;padding:7px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:.86rem;margin-bottom:10px;outline:none}
+.search-box:focus{border-color:#221C46;box-shadow:0 0 0 3px rgba(34,28,70,.1)}
+table{width:100%;border-collapse:collapse;font-size:.81rem}
+th{background:#221C46;color:#fff;padding:7px 11px;text-align:left;font-weight:600;font-size:.76rem}
+td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FAFC}
+/* ── Histórico ───────────────────────────────────── */
+.sel{width:100%;padding:7px 11px;border:1px solid #E2E8F0;border-radius:8px;font-size:.86rem;margin-bottom:14px;outline:none;background:#fff;cursor:pointer}
+.chart-wrap{margin-bottom:20px}.chart-title{font-size:.86rem;font-weight:600;color:#334155;margin-bottom:7px}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.footer{text-align:center;padding:16px;font-size:.7rem;color:#94A3B8;border-top:1px solid #E2E8F0;margin-top:6px}
+/* ── Responsive ──────────────────────────────────── */
+@media(max-width:700px){
+  .app-shell{flex-direction:column}
+  .sidebar{width:100%;height:auto;position:relative;flex-direction:row;align-items:center;flex-wrap:nowrap;padding:6px;gap:4px;overflow-x:auto}
+  .sidebar-logo{padding:6px 10px;border-bottom:none;margin-bottom:0;white-space:nowrap;font-size:.85rem}
+  .sidebar-logo span{display:none}
+  .nav-btn{width:auto;flex-direction:column;gap:2px;padding:7px 10px;font-size:.72rem;white-space:nowrap}
+  .nav-icon{width:auto}
+  .metrics{flex-wrap:wrap}.metric{min-width:calc(33% - 2px)}
+  .charts-grid{grid-template-columns:1fr}.card-header{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">Hub RH<span>Resultados</span></div>
+  <button class="nav-btn active" id="nav-pcd" onclick="showModule('pcd',this)">
+    <span class="nav-icon">♿</span><span>Cota PCD</span>
+  </button>
+  
+</aside>
+
+<!-- ── Main area ─────────────────────────────────────────────────────────── -->
+<div class="main-area">
+
+<!-- PCD Module -->
+<div id="module-pcd" class="module">
+  <div class="page-header">
+    <h1>Cota PCD · Lei 8.213/91</h1>
+    <select class="comp-sel" id="pcd-comp-global" onchange="mudarCompetenciaPcd(this.value)">
+      <option value="01/2025">Competência 01/2025</option>
+    </select>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTab('resultado',event)">📊 Resultado</button>
+    <button class="tab-btn" onclick="showTab('lista',event)">👥 Lista de PCDs</button>
+    <button class="tab-btn" onclick="showTab('saidas',event)">🚪 Saída de PCDs</button>
+    <button class="tab-btn" onclick="showTab('historico',event)">📈 Histórico</button>
+  </div>
+  <div id="tab-resultado" class="tab-content active">
+    <div id="pcd-cards-01-2025" class="cards-set">
+<div class="card" style="background:#F0FDF4"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação</span><span class="card-code"> (cód. 1000)</span></div><span class="card-status st-ok">✅ OK</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">706</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">626</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">4%</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">26</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">28</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>22</b> &nbsp;·&nbsp; Aprendizes: <b>25</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>5</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação SP</span><span class="card-code"> (cód. 1001)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">3</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">3</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>0</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação CL</span><span class="card-code"> (cód. 1002)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">11</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">10</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>1</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Artmed Panamericana Editora Ltda</span><span class="card-sub"> · Artmed</span><span class="card-code"> (cód. 2000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">26</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">24</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>2</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Artmed Panamericana Editora Ltda</span><span class="card-sub"> · Artmed CL</span><span class="card-code"> (cód. 2001)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">3</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">3</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>0</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">MDS Cursos e Concursos Ltda</span><span class="card-sub"> · MDS Cursos e Concursos Ltda</span><span class="card-code"> (cód. 3000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">6</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">6</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>0</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Algetec Tecnologia Industria e Comercio</span><span class="card-sub"> · Algetec Tecnologia Industria e Comercio</span><span class="card-code"> (cód. 4000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">49</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">36</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>12</b> &nbsp;·&nbsp; Aprendizes: <b>0</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>1</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Saber em Rede Prestação de Serviços</span><span class="card-sub"> · Saber em Rede Prestação de Serviços</span><span class="card-code"> (cód. 5000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Total colab.</div><div class="m-value" style="color:#0F172A">2</div></div><div class="metric"><div class="m-label">Base PCD</div><div class="m-value" style="color:#0F172A">1</div></div><div class="metric"><div class="m-label">% Cota (Lei)</div><div class="m-value" style="color:#0F172A">ISENTO</div></div><div class="metric"><div class="m-label">Cota necessária</div><div class="m-value" style="color:#0F172A">—</div></div><div class="metric"><div class="m-label">PCDs contratados</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Exclusões — Estagiários: <b>0</b> &nbsp;·&nbsp; Aprendizes: <b>0</b> &nbsp;·&nbsp; Pró-Labore/Dir.: <b>1</b></div></div>
+</div>
+
+  </div>
+  <div id="tab-lista" class="tab-content">
+    <div id="lista-header" style="font-size:.9rem;font-weight:700;color:#0F172A;margin-bottom:12px"></div>
+    <div id="lista-tipos"></div>
+    <input class="search-box" type="text" id="search-lista" placeholder="Buscar por nome, cargo, tipo..." oninput="filtrarLista()">
+    <div style="overflow-x:auto">
+      <table><thead><tr>
+        <th>Matrícula</th><th>Colaborador</th><th>Tipo de Deficiência</th>
+        <th>Cargo</th><th>Empresa</th><th>Estabelecimento</th>
+      </tr></thead><tbody id="lista-body"></tbody></table>
+    </div>
+    <p id="lista-count" style="font-size:.72rem;color:#94A3B8;margin-top:6px"></p>
+  </div>
+  <div id="tab-saidas" class="tab-content">
+    <select class="sel" id="pcd-periodo-sel" onchange="renderSaidasPcd()" style="width:auto;max-width:220px;margin-bottom:10px">
+      <option value="3">Últimos 3 meses</option>
+      <option value="6">Últimos 6 meses</option>
+      <option value="12" selected>Últimos 12 meses</option>
+      <option value="24">Últimos 24 meses</option>
+      <option value="36">Últimos 36 meses</option>
+      <option value="0">Todos</option>
+    </select>
+    <p style="font-size:.85rem;font-weight:700;color:#0F172A;margin-bottom:10px" id="saidas-pcd-header"></p>
+    <input class="search-box" type="text" id="search-saidas-pcd" placeholder="Buscar por nome, deficiência, empresa..." oninput="filtrarSaidasPcd()">
+    <div style="overflow-x:auto">
+      <table><thead><tr>
+        <th>Colaborador</th><th>Tipo Deficiência</th><th>Data Rescisão</th>
+        <th>Cargo</th><th>Empresa</th><th>Iniciativa</th>
+      </tr></thead><tbody id="saidas-pcd-body"></tbody></table>
+    </div>
+    <p id="saidas-pcd-count" style="font-size:.72rem;color:#94A3B8;margin-top:6px"></p>
+  </div>
+  <div id="tab-historico" class="tab-content">
+    <div id="hist-empty" style="color:#64748B;font-size:.88rem;padding:16px 0">Nenhum histórico disponível.</div>
+    <div id="hist-content" style="display:none">
+      <select class="sel" id="emp-sel" onchange="renderCharts()"></select>
+      <div class="charts-grid">
+        <div class="chart-wrap">
+          <div class="chart-title">PCDs contratados × Cota necessária</div>
+          <canvas id="chart-linha" height="220"></canvas>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Pendente por competência</div>
+          <canvas id="chart-pendente" height="220"></canvas>
+        </div>
+      </div>
+      <div id="tipo-wrap" class="chart-wrap" style="display:none">
+        <div class="chart-title">Composição por tipo de deficiência</div>
+        <canvas id="chart-tipo" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="footer">Hub RH · Gerado em 25/05/2026 às 13:11 · Lei 8.213/91</div>
+</div>
+
+
+
+</div><!-- /.main-area -->
+</div><!-- /.app-shell -->
+
+<script>
+// ── Dados ──────────────────────────────────────────────────────────────────────
+const LISTA_POR_COMP   = {"01/2025": [{"Matrícula": "1438", "Colaborador": "ALINE DE SOUZA BARRETO", "Cargo": "ANALISTA DE REGISTRO ACADÊMICO", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1712", "Colaborador": "ALINE ROSA RODRIGUES", "Cargo": "ANALISTA DE PRODUCAO DE CONTEUDO", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3003", "Colaborador": "ANA KAROLINA DO NASCIMENTO LOPES", "Cargo": "ANALISTA DE SUPORTE", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1837", "Colaborador": "ARTHUR CASTANHARI", "Cargo": "ANALISTA DE INFRAESTRUTURA", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2848", "Colaborador": "BARBARA SILVA TELES DE MENEZES", "Cargo": "DESIGNER EDUCACIONAL", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3104", "Colaborador": "DEBORA REGINA DA SILVA", "Cargo": "ASSISTENTE DE COBRANÇA", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2003", "Colaborador": "ELIAS BRESSLER", "Cargo": "ESPECIALISTA DE TI", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2891", "Colaborador": "ESTEVAM MEDINA LEAL", "Cargo": "ASSISTENTE CONTÁBIL", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3030", "Colaborador": "EUGENIO FERREIRA BRAUNER", "Cargo": "COORDENADOR EDITORIAL I", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2892", "Colaborador": "EVELYN SERENA MOREIRA FERMINO", "Cargo": "ASSISTENTE DE OPERACOES", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2808", "Colaborador": "FERNANDA PERON SORANZO", "Cargo": "ANALISTA DE MARKETING", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3062", "Colaborador": "GABRIEL NUNES SOARES", "Cargo": "ASSISTENTE DE ATENDIMENTO II", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "599", "Colaborador": "JOCEMAR DA LUZ IBARR", "Cargo": "ANALISTA FINANCEIRO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2771", "Colaborador": "JONAS EDUARDO BAIERLE", "Cargo": "ASSISTENTE DE ATENDIMENTO II", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2998", "Colaborador": "KARINA ANTONIO", "Cargo": "ANALISTA DE PRODUCAO DE CONTEUDO", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3170", "Colaborador": "LEVY BEZERRA HOLANDA", "Cargo": "DESENVOLVEDOR FULL STACK", "Tipo de Deficiência": "Visual", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2893", "Colaborador": "LORENZO RONDON CASTIGLIA", "Cargo": "ASSISTENTE DE RH", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2598", "Colaborador": "MARCO ANTONIO PEREIRA REGO", "Cargo": "ASSISTENTE DE VENDAS II", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3207", "Colaborador": "MARCOS DIOVANNI GOMES DALLA VECCHIA", "Cargo": "ASSISTENTE DE REGISTRO ACADEMICO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2806", "Colaborador": "MATHEUS DE OLIVEIRA DE CARVALHO DA SILVA", "Cargo": "ANALISTA DE PROJETOS", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2039", "Colaborador": "MICHELLE RIBEIRO BACALHAU", "Cargo": "COORDENADOR DE PRODUCAO DE CONTEUDO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2894", "Colaborador": "NATIELE DOS SANTOS LOPES", "Cargo": "ASSISTENTE CONTÁBIL", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2726", "Colaborador": "NELSON LUIZ MARINS PEREIRA", "Cargo": "ASSISTENTE FINANCEIRO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "2031", "Colaborador": "RAISSA TENUTO DE MELLO", "Cargo": "ANALISTA DE DADOS", "Tipo de Deficiência": "Mental", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1759", "Colaborador": "REVELINO NASCIMENTO DA SILVA", "Cargo": "ANALISTA CONTABIL", "Tipo de Deficiência": "Auditiva", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1760", "Colaborador": "RONALDO SOUZA SBARDELOTTO", "Cargo": "ASSISTENTE DE VENDAS I", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "1946", "Colaborador": "TATIANA RODRIGUES QUINTANA", "Cargo": "COORDENADOR DE ESTRUTURA E EFICIENCIA", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "603", "Colaborador": "TIANE ISABELA GASS", "Cargo": "ASSISTENTE ADMINISTRATIVO", "Tipo de Deficiência": "Física", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}]};
+const HIST             = {"GA Educação LTDA": {"labels": ["01/2025"], "pcds": [28], "cota": [26], "pendente": [-2]}, "Artmed Panamericana Editora Ltda": {"labels": ["01/2025"], "pcds": [0], "cota": [0], "pendente": [0]}, "MDS Cursos e Concursos Ltda": {"labels": ["01/2025"], "pcds": [0], "cota": [0], "pendente": [0]}, "Algetec Tecnologia Industria e Comercio": {"labels": ["01/2025"], "pcds": [0], "cota": [0], "pendente": [0]}, "Saber em Rede Prestação de Serviços": {"labels": ["01/2025"], "pcds": [0], "cota": [0], "pendente": [0]}};
+const TIPO_HIST        = {"GA Educação LTDA": {"tipos": ["Auditiva", "Física", "Mental", "Visual"], "labels": ["01/2025"], "datasets": {"Auditiva": [4], "Física": [12], "Mental": [9], "Visual": [3]}}};
+const EMPRESAS         = ["Algetec Tecnologia Industria e Comercio", "Artmed Panamericana Editora Ltda", "GA Educação LTDA", "MDS Cursos e Concursos Ltda", "Saber em Rede Prestação de Serviços"];
+const COMPETENCIAS     = ["01/2025"];
+const LISTA_APR        = {};
+const HIST_APR         = {};
+const EMPRESAS_APR     = [];
+const COMPS_APR        = [];
+const SAIDAS_PCD       = [{"Colaborador": "PETERSON SCIREA ROSSATO", "Tipo de Deficiência": "Mental", "Data Rescisão": "06/11/2024", "Cargo": "ASSISTENTE DE PLANEJAMENTO DE OPERACAO", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "RENATA SILVA DA SILVA", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "05/11/2024", "Cargo": "ASSISTENTE DE REGISTRO ACADEMICO", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}, {"Colaborador": "FRANCISCO DE SOUZA SANTOS JUNIOR", "Tipo de Deficiência": "Visual", "Data Rescisão": "01/10/2024", "Cargo": "DESENVOLVEDOR FULL STACK", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}, {"Colaborador": "LUIS EDUARDO BATISTELE DA SILVA BAPTISTA", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "07/08/2024", "Cargo": "COORDENADOR DE GOVERNANÇA DE TI", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "THAYNARA SCHMIDT SIMOES", "Tipo de Deficiência": "Física", "Data Rescisão": "22/03/2024", "Cargo": "ASSISTENTE FISCAL", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "DANIELE DA SILVEIRA RIBEIRO", "Tipo de Deficiência": "Física", "Data Rescisão": "22/02/2024", "Cargo": "ASSISTENTE DE ATENDIMENTO I", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Rescisão antecipada (empregado)"}, {"Colaborador": "EUGENIO FERREIRA BRAUNER", "Tipo de Deficiência": "Visual", "Data Rescisão": "31/01/2024", "Cargo": "COORDENADOR EDITORIAL I", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "MATHEUS FONSECA BARBOSA", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "12/12/2023", "Cargo": "ASSISTENTE DE PRODUCAO DE CONTEUDO", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}, {"Colaborador": "MARCOS DIOVANNI GOMES DALLA VECCHIA", "Tipo de Deficiência": "Física", "Data Rescisão": "01/12/2023", "Cargo": "ASSISTENTE DE ATENDIMENTO I", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "PAMELA GOMES VIGANO", "Tipo de Deficiência": "Visual", "Data Rescisão": "25/09/2023", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Rescisão antecipada (empregado)"}, {"Colaborador": "SHEILA BUENO TESTA", "Tipo de Deficiência": "Visual", "Data Rescisão": "12/09/2023", "Cargo": "ASSISTENTE DE ATENDIMENTO I", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "WASCHINGTON RAIMUNDO PAES", "Tipo de Deficiência": "Física", "Data Rescisão": "12/06/2023", "Cargo": "CONSULTOR DE TELEVENDAS", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "KENNYA HAICHA SILVEIRA DA SILVA", "Tipo de Deficiência": "Mental", "Data Rescisão": "18/04/2023", "Cargo": "ASSISTENTE DE VENDAS I", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "LUCIENE RIBEIRO DOS SANTOS DE FREITAS", "Tipo de Deficiência": "Física", "Data Rescisão": "20/03/2023", "Cargo": "REVISOR", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}, {"Colaborador": "FERNANDA PERON SORANZO", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "31/01/2023", "Cargo": "ASSISTENTE DE MARKETING", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "JONAS EDUARDO BAIERLE", "Tipo de Deficiência": "Física", "Data Rescisão": "31/01/2023", "Cargo": "ASSISTENTE DE ATENDIMENTO I", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "NELSON LUIZ MARINS PEREIRA", "Tipo de Deficiência": "Física", "Data Rescisão": "31/01/2023", "Cargo": "ASSISTENTE DE FATURAMENTO", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "MATHEUS DE OLIVEIRA DE CARVALHO DA SILVA", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "31/01/2023", "Cargo": "ANALISTA DE PRODUCAO AUDIOVISUAL", "Empresa": "MDS Cursos e Concursos Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "MARCO ANTONIO PEREIRA REGO", "Tipo de Deficiência": "Física", "Data Rescisão": "31/12/2022", "Cargo": "CONSULTOR DE TELEVENDAS", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "WASCHINGTON RAIMUNDO PAES", "Tipo de Deficiência": "Física", "Data Rescisão": "31/12/2022", "Cargo": "CONSULTOR DE TELEVENDAS", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Transferência", "Motivo": "Transferência intragrupo"}, {"Colaborador": "GABRIEL BARBOSA CAVALCANTE", "Tipo de Deficiência": "Visual", "Data Rescisão": "22/07/2022", "Cargo": "ANALISTA DE DADOS", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "PATRICIA OLIVEIRA GONCALVES", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "17/06/2022", "Cargo": "ASSISTENTE DE REGISTRO ACADEMICO", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "KAROLINE SOLIMAN DE MORAIS", "Tipo de Deficiência": "Visual", "Data Rescisão": "06/06/2022", "Cargo": "ASSISTENTE DE ATENDIMENTO I", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "ANA BEATRIZ LOPES FRANCOSO", "Tipo de Deficiência": "Intelectual", "Data Rescisão": "20/05/2022", "Cargo": "TESTER LEAD", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}, {"Colaborador": "VITORIA MIRANDA VISNIEVSKI", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "28/01/2022", "Cargo": "ANALISTA DE INBOUND MARKETING", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Rescisão antecipada (empregado)"}, {"Colaborador": "LEANDRO ALVES NUNES DA SILVA", "Tipo de Deficiência": "Física", "Data Rescisão": "03/12/2021", "Cargo": "ANALISTA CONTABIL", "Empresa": "GA Educação LTDA", "Iniciativa": "Término", "Motivo": "Fim de contrato a termo"}, {"Colaborador": "RONALDO BRANDAO FERREYRA", "Tipo de Deficiência": "Auditiva", "Data Rescisão": "18/11/2021", "Cargo": "DESENVOLVEDOR FULL STACK PHP", "Empresa": "GA Educação LTDA", "Iniciativa": "Empregado", "Motivo": "Pedido de demissão"}, {"Colaborador": "FERNANDA NERY DOS SANTOS", "Tipo de Deficiência": "Mental", "Data Rescisão": "11/11/2021", "Cargo": "ASSISTENTE DE OPERAÇÃO", "Empresa": "GA Educação LTDA", "Iniciativa": "Empresa", "Motivo": "Rescisão antecipada (empregador)"}, {"Colaborador": "ROBSON SOUZA DE FREITAS", "Tipo de Deficiência": "Física", "Data Rescisão": "10/02/2020", "Cargo": "ASSISTENTE DE EXPEDIÇÃO", "Empresa": "Artmed Panamericana Editora Ltda", "Iniciativa": "Empresa", "Motivo": "Sem justa causa (empregador)"}];
+const SAIDAS_APR       = [{"Colaborador": "HELIO ROBERTO PASSOS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "26/03/2026", "Empresa": "GA Educação LTDA", "Data Admissão": "10/09/2025"}, {"Colaborador": "LUCCA VENTURINI BARBOZA DOS SANTOS", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "12/03/2026", "Empresa": "GA Educação LTDA", "Data Admissão": "10/03/2025"}, {"Colaborador": "CAROLINE SILVA BERTE", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "12/03/2026", "Empresa": "GA Educação LTDA", "Data Admissão": "10/03/2025"}, {"Colaborador": "LUCAS NUNES DA SILVA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "13/02/2026", "Empresa": "GA Educação LTDA", "Data Admissão": "10/09/2025"}, {"Colaborador": "ALESSANDRA GRILLO DA SILVA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "08/12/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "11/11/2025"}, {"Colaborador": "EDUARDA FERREIRA SUBTIL", "Cargo": "APRENDIZ", "Data Rescisão": "22/10/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "07/10/2024"}, {"Colaborador": "GABRIEL DOS SANTOS GOMES", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "01/10/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "10/03/2025"}, {"Colaborador": "SIRLEI DA SILVA RENIS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "RAFAEL DUTRA RIBAS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "MAURA DENISE SANTOS DE MATOS NEVES", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "SOFIA DE CASTRO OLIVEIRA MENGUE", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "03/10/2023"}, {"Colaborador": "VERA LUIZA BERGAMO", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "DOUGLAS DOS SANTOS VARGA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "21/08/2023"}, {"Colaborador": "LILIAM KELLY DOUGLAS DE OLIVEIRA BRAZ SODRE", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "JAQUELINE SEVERO DE MELO", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "INGRID DOS SANTOS HEGER", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "23/07/2024"}, {"Colaborador": "VICENTE GIL DE CASTILHOS ARAUJO", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "21/08/2023"}, {"Colaborador": "GERMANO FERNANDO NUNES PADILHA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "MARIA IVONETE DO NASCIMENTO", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "LISIANE VASCONCELOS DOS SANTOS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "DEIVISSON FIGUEIREDO SEQUEIRA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "BRUNO DE ABREU ANDRIESKI", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "CLAUDIANE DIAS SOARES", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "DIVA BARRETO DE VARGAS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "31/07/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "RENATO ALEXANDRE DA SILVA DE SOUZA", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "23/05/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "01/09/2023"}, {"Colaborador": "EDUARDA LUIZ SCAPINI", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "14/05/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "15/04/2024"}, {"Colaborador": "ANA JULIA TAVARES MATOS", "Cargo": "APRENDIZ", "Data Rescisão": "03/04/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "25/03/2024"}, {"Colaborador": "JULLIA DOS SANTOS RODRIGUES", "Cargo": "APRENDIZ", "Data Rescisão": "03/04/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "25/03/2024"}, {"Colaborador": "MILENA APARECIDA FAJARDO DE MOURA", "Cargo": "APRENDIZ", "Data Rescisão": "03/04/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "25/03/2024"}, {"Colaborador": "ALESSANDRO DOS SANTOS DE JESUS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "01/04/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "LEANDRO RAZERA DIAS", "Cargo": "APRENDIZ PAO DOS POBRES", "Data Rescisão": "20/03/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "RHAYSSA DA COSTA BITTENCOURT", "Cargo": "APRENDIZ", "Data Rescisão": "05/03/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "25/03/2024"}, {"Colaborador": "PEDRO HENRIQUE ROCHA", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "10/02/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "15/04/2024"}, {"Colaborador": "ARTHUR FRANCISCO GAUBER DA SILVA", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "15/01/2025", "Empresa": "GA Educação LTDA", "Data Admissão": "12/08/2024"}, {"Colaborador": "MARIANA RODRIGUES", "Cargo": "JOVEM APRENDIZ TECH", "Data Rescisão": "01/11/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "15/04/2024"}, {"Colaborador": "JULIA GARCIA DE SOUZA", "Cargo": "APRENDIZ", "Data Rescisão": "17/05/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "YASMIN ABIANNA DE ABREU", "Cargo": "APRENDIZ", "Data Rescisão": "17/05/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "VINICIUS SILVEIRA TRINDADE", "Cargo": "APRENDIZ", "Data Rescisão": "17/05/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "ANTONIO CELMAR NETO PORTO VEIGA", "Cargo": "APRENDIZ", "Data Rescisão": "17/05/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "DIENIFER GABRIELI SANTOS DE SOUZA", "Cargo": "APRENDIZ", "Data Rescisão": "01/04/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "21/08/2023"}, {"Colaborador": "ARTHUR MARTINS RIBEIRO", "Cargo": "APRENDIZ", "Data Rescisão": "09/01/2024", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "IZABELLE CRISTINA RIBEIRO ANDRADE", "Cargo": "JOVEM APRENDIZ", "Data Rescisão": "23/11/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "10/07/2023"}, {"Colaborador": "ANTONIO SILVA SANTOS NETO", "Cargo": "JOVEM APRENDIZ", "Data Rescisão": "03/11/2023", "Empresa": "Algetec Tecnologia Industria e Comercio", "Data Admissão": "16/11/2022"}, {"Colaborador": "MARILIA DE JESUS SILVA", "Cargo": "JOVEM APRENDIZ", "Data Rescisão": "03/11/2023", "Empresa": "Algetec Tecnologia Industria e Comercio", "Data Admissão": "16/11/2022"}, {"Colaborador": "IZABELLE CRISTINA RIBEIRO ANDRADE", "Cargo": "JOVEM APRENDIZ", "Data Rescisão": "31/08/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "10/07/2023"}, {"Colaborador": "BIANCA RAFAELA DOS SANTOS", "Cargo": "APRENDIZ", "Data Rescisão": "09/08/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "NICOLE ANDREATTA ANACLETO", "Cargo": "APRENDIZ", "Data Rescisão": "04/07/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "DANIEL SOARES GOMES", "Cargo": "APRENDIZ", "Data Rescisão": "23/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "PETERSON SCIREA ROSSATO", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "NATIELE DOS SANTOS LOPES", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "AMANDA CORREA DA SILVA", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "MATHEUS GOMES VARGAS", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "JULIA WIERENICZ WEBER", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "ESTEVAM MEDINA LEAL", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "EVELYN SERENA MOREIRA FERMINO", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "FELIPE SILVEIRA DA SILVA", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "LORENZO RONDON CASTIGLIA", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "GILSON GABRIEL CARVALHO GARAY", "Cargo": "APRENDIZ", "Data Rescisão": "07/06/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "JOANA MARIA DA SENA NUNES", "Cargo": "APRENDIZ", "Data Rescisão": "19/04/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "MAURICIO CORREA FERRAZ", "Cargo": "APRENDIZ", "Data Rescisão": "20/03/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "ERIKA LORDEIRO DE FREITAS", "Cargo": "APRENDIZ", "Data Rescisão": "01/02/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "26/09/2022"}, {"Colaborador": "JULIA WIERENICZ WEBER", "Cargo": "APRENDIZ", "Data Rescisão": "31/01/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "MATHEUS GOMES VARGAS", "Cargo": "APRENDIZ", "Data Rescisão": "31/01/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "GILSON GABRIEL CARVALHO GARAY", "Cargo": "APRENDIZ", "Data Rescisão": "31/01/2023", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "SAMARAH FLORES DE MAGALHAES", "Cargo": "APRENDIZ", "Data Rescisão": "25/01/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "07/06/2021"}, {"Colaborador": "KAROLINE GABRIELY PEREIRA MELO", "Cargo": "APRENDIZ", "Data Rescisão": "02/01/2023", "Empresa": "GA Educação LTDA", "Data Admissão": "17/05/2021"}, {"Colaborador": "RAFAEL VIANA FIGUEIREDO", "Cargo": "APRENDIZ", "Data Rescisão": "07/12/2022", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "SARA CAMILE CHABI DOS SANTOS", "Cargo": "APRENDIZ", "Data Rescisão": "21/11/2022", "Empresa": "Algetec Tecnologia Industria e Comercio", "Data Admissão": "18/10/2021"}, {"Colaborador": "IGOR GUIMARAES SOUSA", "Cargo": "APRENDIZ", "Data Rescisão": "18/10/2022", "Empresa": "Algetec Tecnologia Industria e Comercio", "Data Admissão": "18/10/2021"}, {"Colaborador": "LUCAS RIBEIRO DA ROSA", "Cargo": "APRENDIZ", "Data Rescisão": "17/08/2022", "Empresa": "Artmed Panamericana Editora Ltda", "Data Admissão": "18/10/2021"}, {"Colaborador": "LAISLA MORGANA BASSANI", "Cargo": "APRENDIZ", "Data Rescisão": "01/08/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "17/05/2021"}, {"Colaborador": "ANA LUCIA SILVA DE OLIVEIRA", "Cargo": "APRENDIZ", "Data Rescisão": "27/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "18/10/2021"}, {"Colaborador": "EDUARDA FORTES OLIVEIRA", "Cargo": "APRENDIZ", "Data Rescisão": "07/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "23/11/2020"}, {"Colaborador": "LUCCA TESSER DA SILVA", "Cargo": "APRENDIZ", "Data Rescisão": "07/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "23/11/2020"}, {"Colaborador": "MARCELLE BENFICA FLORISBAL", "Cargo": "APRENDIZ", "Data Rescisão": "07/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "23/11/2020"}, {"Colaborador": "ANDRIELI CASTRO GASPAR", "Cargo": "APRENDIZ", "Data Rescisão": "07/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "23/11/2020"}, {"Colaborador": "VINICIUS SOBREIRO DE LARA MACHADO", "Cargo": "APRENDIZ", "Data Rescisão": "06/07/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "23/11/2020"}, {"Colaborador": "MARIA EDUARDA RIBEIRO CORREA", "Cargo": "APRENDIZ", "Data Rescisão": "17/06/2022", "Empresa": "GA Educação LTDA", "Data Admissão": "18/02/2021"}, {"Colaborador": "CAUA SALES DOMINGOS", "Cargo": "APRENDIZ", "Data Rescisão": "05/05/2021", "Empresa": "GA Educação LTDA", "Data Admissão": "06/01/2020"}, {"Colaborador": "LUISA JACQUES VIERA", "Cargo": "APRENDIZ", "Data Rescisão": "30/04/2021", "Empresa": "GA Educação LTDA", "Data Admissão": "22/07/2019"}];
+
+let compPcd = COMPETENCIAS[0] || '';
+let compApr = COMPS_APR[0] || '';
+
+// ── Sidebar ────────────────────────────────────────────────────────────────────
+function showModule(name, btn) {
+  document.querySelectorAll('.module').forEach(el => el.hidden = true);
+  document.getElementById('module-' + name).hidden = false;
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  (btn || document.getElementById('nav-' + name)).classList.add('active');
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function slugHtml(c) { return c.replace('/','-'); }
+function esc(v) {
+  return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── PCD — Competência ──────────────────────────────────────────────────────────
+function mudarCompetenciaPcd(comp) {
+  compPcd = comp;
+  const sl = slugHtml(comp);
+  document.querySelectorAll('[id^="pcd-cards-"]').forEach(el => el.hidden = true);
+  const c = document.getElementById('pcd-cards-' + sl);
+  if (c) c.hidden = false;
+  atualizarLista();
+}
+
+// ── PCD — Tabs ─────────────────────────────────────────────────────────────────
+function showTab(id, event) {
+  ['resultado','lista','saidas','historico'].forEach(t => {
+    document.getElementById('tab-' + t).classList.remove('active');
+  });
+  document.querySelectorAll('#module-pcd .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  if (id === 'historico') initHist();
+  if (id === 'lista') atualizarLista();
+  if (id === 'saidas') renderSaidasPcd();
+}
+
+// ── PCD — Lista ────────────────────────────────────────────────────────────────
+const COR_TIPO = {'Física':'#3B82F6','Mental':'#8B5CF6','Auditiva':'#10B981','Intelectual':'#F59E0B','Visual':'#EF4444','Múltipla':'#6B7280'};
+const BG_TIPO  = {'Física':'#EFF6FF','Mental':'#F5F3FF','Auditiva':'#F0FDF4','Intelectual':'#FFFBEB','Visual':'#FEF2F2','Múltipla':'#F8FAFC'};
+let listaCache = [];
+function atualizarLista() {
+  listaCache = LISTA_POR_COMP[compPcd] || [];
+  const n = listaCache.length;
+  document.getElementById('lista-header').textContent = n + ' PCD(s) ativos · Competência ' + compPcd;
+  renderTipos(listaCache);
+  document.getElementById('search-lista').value = '';
+  renderLista(listaCache);
+}
+function renderTipos(rows) {
+  const total = rows.length;
+  const cnt = {};
+  rows.forEach(r => { const t = r['Tipo de Deficiência']||'Não informado'; cnt[t]=(cnt[t]||0)+1; });
+  const sorted = Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  const html = sorted.map(([tipo,qtd]) => {
+    const pct = total ? (qtd/total*100) : 0;
+    const cor = COR_TIPO[tipo]||'#64748B';
+    const bg  = BG_TIPO[tipo] ||'#F8FAFC';
+    return `<div style="display:inline-flex;flex-direction:column;align-items:center;border:1px solid ${cor}40;border-radius:8px;padding:8px 12px;background:${bg};margin:0 6px 6px 0;min-width:72px">
+      <div style="font-size:.64rem;color:${cor};font-weight:600;text-transform:uppercase">${esc(tipo)}</div>
+      <div style="font-size:1.3rem;font-weight:700;color:${cor}">${qtd}</div>
+      <div style="font-size:.68rem;opacity:.7;color:${cor}">${pct.toFixed(0)}%</div>
+    </div>`;
+  }).join('');
+  document.getElementById('lista-tipos').innerHTML = '<div style="display:flex;flex-wrap:wrap;margin-bottom:12px">' + html + '</div>';
+}
+function renderLista(rows) {
+  document.getElementById('lista-body').innerHTML = rows.map(r =>
+    `<tr><td>${esc(r['Matrícula'])}</td><td>${esc(r['Colaborador'])}</td>
+     <td>${esc(r['Tipo de Deficiência'])}</td><td>${esc(r['Cargo'])}</td>
+     <td>${esc(r['Empresa'])}</td><td>${esc(r['Estabelecimento'])}</td></tr>`
+  ).join('');
+  document.getElementById('lista-count').textContent = rows.length + ' registro(s)';
+}
+function filtrarLista() {
+  const q = document.getElementById('search-lista').value.toLowerCase();
+  renderLista(q ? listaCache.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))) : listaCache);
+}
+
+// ── Helpers período ────────────────────────────────────────────────────────────
+function _parseDataBr(s) {
+  if (!s) return null;
+  let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+  m = s.match(/^(\d{2})\/(\d{4})$/);
+  if (m) return new Date(+m[2], +m[1]-1, 1);
+  return null;
+}
+function _filtrarPeriodo(rows, meses, campo) {
+  if (!meses || meses <= 0) return rows;
+  const lim = new Date(); lim.setMonth(lim.getMonth() - meses);
+  return rows.filter(r => { const d = _parseDataBr(r[campo]); return d && d >= lim; });
+}
+
+// ── PCD — Saídas ───────────────────────────────────────────────────────────────
+let saidasPcdCache = SAIDAS_PCD;
+let _saidasPcdFilt = [];
+function renderSaidasPcd() {
+  const meses = parseInt(document.getElementById('pcd-periodo-sel').value);
+  _saidasPcdFilt = _filtrarPeriodo(saidasPcdCache, meses, 'Data Rescisão');
+  const n = _saidasPcdFilt.length;
+  document.getElementById('saidas-pcd-header').textContent =
+    n > 0 ? n + ' saída(s) de PCD no período' : 'Nenhuma saída de PCD no período.';
+  document.getElementById('search-saidas-pcd').value = '';
+  renderRowsSaidasPcd(_saidasPcdFilt);
+}
+function renderRowsSaidasPcd(rows) {
+  document.getElementById('saidas-pcd-body').innerHTML = rows.map(r =>
+    `<tr><td>${esc(r['Colaborador'])}</td><td>${esc(r['Tipo de Deficiência'])}</td>
+     <td>${esc(r['Data Rescisão'])}</td><td>${esc(r['Cargo'])}</td>
+     <td>${esc(r['Empresa'])}</td><td>${esc(r['Iniciativa'])}</td></tr>`
+  ).join('');
+  document.getElementById('saidas-pcd-count').textContent = rows.length + ' registro(s)';
+}
+function filtrarSaidasPcd() {
+  const q = document.getElementById('search-saidas-pcd').value.toLowerCase();
+  renderRowsSaidasPcd(q ? _saidasPcdFilt.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))) : _saidasPcdFilt);
+}
+
+// ── PCD — Histórico ────────────────────────────────────────────────────────────
+let chartLinha=null, chartPendente=null, chartTipo=null, histInited=false;
+const TIPO_COLORS=['#3B82F6','#8B5CF6','#10B981','#F59E0B','#EF4444','#6B7280','#EC4899','#14B8A6'];
+function initHist() {
+  if (histInited) return; histInited = true;
+  if (!EMPRESAS.length) return;
+  document.getElementById('hist-empty').style.display='none';
+  document.getElementById('hist-content').style.display='block';
+  const sel = document.getElementById('emp-sel');
+  EMPRESAS.forEach(emp => { const o=document.createElement('option'); o.value=o.textContent=emp; sel.appendChild(o); });
+  const gaIdx = EMPRESAS.findIndex(e => /ga educa/i.test(e));
+  if (gaIdx >= 0) sel.selectedIndex = gaIdx;
+  renderCharts();
+}
+function renderCharts() {
+  const emp=document.getElementById('emp-sel').value;
+  const d=HIST[emp]; if(!d) return;
+  if(chartLinha) chartLinha.destroy();
+  chartLinha=new Chart(document.getElementById('chart-linha'),{
+    type:'line', data:{labels:d.labels,datasets:[
+      {label:'PCDs contratados',data:d.pcds,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.1)',tension:.3,fill:true},
+      {label:'Cota necessária',data:d.cota,borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,.05)',borderDash:[5,3],tension:.3}
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}
+  });
+  if(chartPendente) chartPendente.destroy();
+  const pPend = d.pendente.map(v => Math.max(0, v));
+  chartPendente=new Chart(document.getElementById('chart-pendente'),{
+    type:'bar', data:{labels:d.labels,datasets:[{
+      label:'Pendente',data:pPend,
+      backgroundColor:pPend.map(v=>v>2?'#FCA5A5':v>0?'#FDE68A':'#BBF7D0'),borderRadius:4
+    }]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+  const td=TIPO_HIST[emp];
+  const tw=document.getElementById('tipo-wrap');
+  if(td&&td.tipos&&td.tipos.length){
+    tw.style.display='block';
+    if(chartTipo) chartTipo.destroy();
+    chartTipo=new Chart(document.getElementById('chart-tipo'),{
+      type:'bar', data:{labels:td.labels,datasets:td.tipos.map((t,i)=>{
+        return {label:t,data:td.datasets[t],backgroundColor:TIPO_COLORS[i%TIPO_COLORS.length],borderRadius:2};
+      })},
+      options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{x:{stacked:true},y:{stacked:true,beginAtZero:true}}}
+    });
+  } else tw.style.display='none';
+}
+
+// ── Aprendiz — Competência ─────────────────────────────────────────────────────
+function mudarCompetenciaApr(comp) {
+  compApr = comp;
+  const sl = slugHtml(comp);
+  document.querySelectorAll('[id^="apr-cards-"]').forEach(el => el.hidden = true);
+  const c = document.getElementById('apr-cards-' + sl);
+  if (c) c.hidden = false;
+  atualizarListaApr();
+}
+
+// ── Aprendiz — Tabs ────────────────────────────────────────────────────────────
+function showTabApr(id, event) {
+  ['resultado','lista','saidas','historico'].forEach(t => {
+    document.getElementById('apr-tab-' + t).classList.remove('active');
+  });
+  document.querySelectorAll('#module-aprendiz .tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('apr-tab-' + id).classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  if (id === 'historico') initHistApr();
+  if (id === 'lista') atualizarListaApr();
+  if (id === 'saidas') renderSaidasApr();
+}
+
+// ── Aprendiz — Lista ───────────────────────────────────────────────────────────
+let listaCacheApr = [];
+function atualizarListaApr() {
+  listaCacheApr = LISTA_APR[compApr] || [];
+  const n = listaCacheApr.length;
+  document.getElementById('apr-lista-header').textContent = n + ' Aprendiz(es) ativo(s) · Competência ' + compApr;
+  document.getElementById('apr-search-lista').value = '';
+  renderListaApr(listaCacheApr);
+}
+function renderListaApr(rows) {
+  document.getElementById('apr-lista-body').innerHTML = rows.map(r =>
+    `<tr><td>${esc(r['Matrícula'])}</td><td>${esc(r['Colaborador'])}</td>
+     <td>${esc(r['Cargo'])}</td><td>${esc(r['Empresa'])}</td>
+     <td>${esc(r['Estabelecimento'])}</td></tr>`
+  ).join('');
+  document.getElementById('apr-lista-count').textContent = rows.length + ' registro(s)';
+}
+function filtrarListaApr() {
+  const q = document.getElementById('apr-search-lista').value.toLowerCase();
+  renderListaApr(q ? listaCacheApr.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))) : listaCacheApr);
+}
+
+// ── Aprendiz — Saídas ─────────────────────────────────────────────────────────
+let saidasAprCache = SAIDAS_APR;
+let _saidasAprFilt = [];
+function renderSaidasApr() {
+  const meses = parseInt(document.getElementById('apr-periodo-sel').value);
+  _saidasAprFilt = _filtrarPeriodo(saidasAprCache, meses, 'Data Rescisão');
+  const n = _saidasAprFilt.length;
+  document.getElementById('saidas-apr-header').textContent =
+    n > 0 ? n + ' saída(s) de Aprendiz no período' : 'Nenhuma saída de Aprendiz no período.';
+  document.getElementById('search-saidas-apr').value = '';
+  renderRowsSaidasApr(_saidasAprFilt);
+}
+function renderRowsSaidasApr(rows) {
+  document.getElementById('saidas-apr-body').innerHTML = rows.map(r =>
+    `<tr><td>${esc(r['Colaborador'])}</td><td>${esc(r['Cargo'])}</td>
+     <td>${esc(r['Data Rescisão'])}</td><td>${esc(r['Empresa'])}</td>
+     <td>${esc(r['Data Admissão'])}</td></tr>`
+  ).join('');
+  document.getElementById('saidas-apr-count').textContent = rows.length + ' registro(s)';
+}
+function filtrarSaidasApr() {
+  const q = document.getElementById('search-saidas-apr').value.toLowerCase();
+  renderRowsSaidasApr(q ? _saidasAprFilt.filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q))) : _saidasAprFilt);
+}
+
+// ── Aprendiz — Histórico ───────────────────────────────────────────────────────
+let aprChartLinha=null, aprChartPendente=null, aprHistInited=false;
+function initHistApr() {
+  if (aprHistInited) return; aprHistInited = true;
+  if (!EMPRESAS_APR.length) return;
+  document.getElementById('apr-hist-empty').style.display='none';
+  document.getElementById('apr-hist-content').style.display='block';
+  const sel = document.getElementById('apr-emp-sel');
+  EMPRESAS_APR.forEach(emp => { const o=document.createElement('option'); o.value=o.textContent=emp; sel.appendChild(o); });
+  const gaIdx = EMPRESAS_APR.findIndex(e => /ga educa/i.test(e));
+  if (gaIdx >= 0) sel.selectedIndex = gaIdx;
+  renderChartsApr();
+}
+function renderChartsApr() {
+  const emp=document.getElementById('apr-emp-sel').value;
+  const d=HIST_APR[emp]; if(!d) return;
+  if(aprChartLinha) aprChartLinha.destroy();
+  aprChartLinha=new Chart(document.getElementById('apr-chart-linha'),{
+    type:'line', data:{labels:d.labels,datasets:[
+      {label:'Aprendizes contratados',data:d.contrat,borderColor:'#0E4B7C',backgroundColor:'rgba(14,75,124,.1)',tension:.3,fill:true},
+      {label:'Cota mínima (5%)',data:d.cota_min,borderColor:'#EF4444',backgroundColor:'rgba(239,68,68,.05)',borderDash:[5,3],tension:.3}
+    ]},
+    options:{responsive:true,plugins:{legend:{position:'bottom'}},scales:{y:{beginAtZero:true}}}
+  });
+  if(aprChartPendente) aprChartPendente.destroy();
+  const aprPend = d.pendente.map(v => Math.max(0, v));
+  aprChartPendente=new Chart(document.getElementById('apr-chart-pendente'),{
+    type:'bar', data:{labels:d.labels,datasets:[{
+      label:'Pendente',data:aprPend,
+      backgroundColor:aprPend.map(v=>v>2?'#FCA5A5':v>0?'#FDE68A':'#BBF7D0'),borderRadius:4
+    }]},
+    options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}
+  });
+}
+</script>
+</body>
+</html>
