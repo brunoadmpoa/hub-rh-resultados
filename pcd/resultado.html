@@ -80,7 +80,7 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
   <button class="nav-btn active" id="nav-pcd" onclick="showModule('pcd',this)">
     <span class="nav-icon">♿</span><span>Cota PCD</span>
   </button>
-  
+  <button class="nav-btn" id="nav-aprendiz" onclick="showModule('aprendiz',this)"><span class="nav-icon">🎓</span><span>Aprendiz</span></button>
 </aside>
 
 <!-- ── Main area ─────────────────────────────────────────────────────────── -->
@@ -155,10 +155,64 @@ td{padding:6px 11px;border-bottom:1px solid #F1F5F9}tr:hover td{background:#F8FA
       </div>
     </div>
   </div>
-  <div class="footer">Hub RH · Gerado em 25/05/2026 às 02:09 · Lei 8.213/91</div>
+  <div class="footer">Hub RH · Gerado em 25/05/2026 às 02:17 · Lei 8.213/91</div>
 </div>
 
 
+<div id="module-aprendiz" class="module" hidden>
+  <div class="page-header" style="background:#0E4B7C">
+    <h1>Aprendiz · Lei 10.097/2000</h1>
+    <select class="comp-sel" id="apr-comp-global" onchange="mudarCompetenciaApr(this.value)">
+      <option value="04/2026">Competência 04/2026</option>
+    </select>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="showTabApr('resultado',event)">📊 Resultado</button>
+    <button class="tab-btn" onclick="showTabApr('lista',event)">👥 Lista de Aprendizes</button>
+    <button class="tab-btn" onclick="showTabApr('historico',event)">📈 Histórico</button>
+  </div>
+  <div id="apr-tab-resultado" class="tab-content active">
+    <div id="apr-cards-04-2026" class="cards-set">
+<div class="card" style="background:#FEF2F2"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação</span><span class="card-code"> (cód. 1000)</span></div><span class="card-status st-critico">🔴 Crítico</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">509</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">26</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">16</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#DC2626">10</div></div></div><div class="card-footer">Total func.: <b>672</b> &nbsp;·&nbsp; Excl. N0–N4: <b>125</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>2</b> &nbsp;·&nbsp; Excl. Estagiários: <b>8</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>16</b> &nbsp;·&nbsp; Afastados: <b>14</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação SP</span><span class="card-code"> (cód. 1001)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Total func.: <b>3</b> &nbsp;·&nbsp; Excl. N0–N4: <b>1</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+<div class="card" style="background:#F0FDF4"><div class="card-header"><div><span class="card-title">GA Educação LTDA</span><span class="card-sub"> · GA Educação CL</span><span class="card-code"> (cód. 1002)</span></div><span class="card-status st-ok">✅ OK</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">9</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">1</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">1</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Total func.: <b>11</b> &nbsp;·&nbsp; Excl. N0–N4: <b>1</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>1</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+<div class="card" style="background:#FFFBEB"><div class="card-header"><div><span class="card-title">Artmed Panamericana Editora Ltda</span><span class="card-sub"> · Artmed</span><span class="card-code"> (cód. 2000)</span></div><span class="card-status st-alerta">⚠️ Alerta</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">19</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">1</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#D97706">1</div></div></div><div class="card-footer">Total func.: <b>20</b> &nbsp;·&nbsp; Excl. N0–N4: <b>0</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>1</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Artmed Panamericana Editora Ltda</span><span class="card-sub"> · Artmed CL</span><span class="card-code"> (cód. 2001)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Total func.: <b>2</b> &nbsp;·&nbsp; Excl. N0–N4: <b>0</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">MDS Cursos e Concursos Ltda</span><span class="card-sub"> · MDS Cursos e Concursos Ltda</span><span class="card-code"> (cód. 3000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Total func.: <b>2</b> &nbsp;·&nbsp; Excl. N0–N4: <b>0</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+<div class="card" style="background:#FFFBEB"><div class="card-header"><div><span class="card-title">Algetec Tecnologia Industria e Comercio</span><span class="card-sub"> · Algetec Tecnologia Industria e Comercio</span><span class="card-code"> (cód. 4000)</span></div><span class="card-status st-alerta">⚠️ Alerta</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">30</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">2</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#D97706">2</div></div></div><div class="card-footer">Total func.: <b>39</b> &nbsp;·&nbsp; Excl. N0–N4: <b>4</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>5</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+<div class="card" style="background:#EFF6FF"><div class="card-header"><div><span class="card-title">Saber em Rede Prestação de Serviços</span><span class="card-sub"> · Saber em Rede Prestação de Serviços</span><span class="card-code"> (cód. 5000)</span></div><span class="card-status st-isento">🔵 Isento</span></div><div class="metrics"><div class="metric"><div class="m-label">Base aprendiz</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">todos − excl. − afastados</div></div><div class="metric"><div class="m-label">Cota mínima</div><div class="m-value" style="color:#0F172A">0</div><div class="m-sub">5% da base</div></div><div class="metric"><div class="m-label">Aprendizes contrat.</div><div class="m-value" style="color:#0F172A">0</div></div><div class="metric"><div class="m-label">Pendente</div><div class="m-value" style="color:#16A34A">✓ Cumprida</div></div></div><div class="card-footer">Total func.: <b>1</b> &nbsp;·&nbsp; Excl. N0–N4: <b>1</b> &nbsp;·&nbsp; Excl. Conselheiro: <b>0</b> &nbsp;·&nbsp; Excl. Estagiários: <b>0</b> &nbsp;·&nbsp; Excl. Aprendizes: <b>0</b> &nbsp;·&nbsp; Afastados: <b>0</b></div></div>
+</div>
+
+  </div>
+  <div id="apr-tab-lista" class="tab-content">
+    <div id="apr-lista-header" style="font-size:.9rem;font-weight:700;color:#0F172A;margin-bottom:12px"></div>
+    <input class="search-box" type="text" id="apr-search-lista" placeholder="Buscar por nome, cargo..." oninput="filtrarListaApr()">
+    <div style="overflow-x:auto">
+      <table><thead><tr>
+        <th>Matrícula</th><th>Colaborador</th><th>Cargo</th>
+        <th>Empresa</th><th>Estabelecimento</th>
+      </tr></thead><tbody id="apr-lista-body"></tbody></table>
+    </div>
+    <p id="apr-lista-count" style="font-size:.72rem;color:#94A3B8;margin-top:6px"></p>
+  </div>
+  <div id="apr-tab-historico" class="tab-content">
+    <div id="apr-hist-empty" style="color:#64748B;font-size:.88rem;padding:16px 0">Nenhum histórico disponível.</div>
+    <div id="apr-hist-content" style="display:none">
+      <select class="sel" id="apr-emp-sel" onchange="renderChartsApr()"></select>
+      <div class="charts-grid">
+        <div class="chart-wrap">
+          <div class="chart-title">Aprendizes contratados × Cota mínima</div>
+          <canvas id="apr-chart-linha" height="220"></canvas>
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-title">Pendente por competência</div>
+          <canvas id="apr-chart-pendente" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">Hub RH · Gerado em 25/05/2026 às 02:17 · Lei 10.097/2000</div>
+</div>
 
 </div><!-- /.main-area -->
 </div><!-- /.app-shell -->
@@ -170,10 +224,10 @@ const HIST             = {"GA Educação LTDA": {"labels": ["03/2026", "04/2026"
 const TIPO_HIST        = {"GA Educação LTDA": {"tipos": ["Auditiva", "Física", "Mental", "Visual"], "labels": ["03/2026", "04/2026"], "datasets": {"Auditiva": [5, 4], "Física": [11, 11], "Mental": [7, 7], "Visual": [3, 3]}}};
 const EMPRESAS         = ["Algetec Tecnologia Industria e Comercio", "Artmed Panamericana Editora Ltda", "GA Educação LTDA", "MDS Cursos e Concursos Ltda", "Saber em Rede Prestação de Serviços"];
 const COMPETENCIAS     = ["04/2026", "03/2026"];
-const LISTA_APR        = {};
-const HIST_APR         = {};
-const EMPRESAS_APR     = [];
-const COMPS_APR        = [];
+const LISTA_APR        = {"04/2026": [{"Matrícula": "3481", "Colaborador": "ANTONIA MOURA AFONSO", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3425", "Colaborador": "ARTHUR GABRIEL PEREIRA DE JESUS RODRIGUES", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3143", "Colaborador": "BRUNO DE MELLO", "Cargo": "APRENDIZ", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3427", "Colaborador": "EVERTON FAGUNDES DA SILVA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3482", "Colaborador": "FERNANDA MARTINS MONCADA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3424", "Colaborador": "FRANCIELE PERSCH", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3423", "Colaborador": "GIOVANA MACHADO ESCARCEL", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3429", "Colaborador": "JESSICA SANTOS DA SILVA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3421", "Colaborador": "KAUA HERTZOG BARBOSA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3416", "Colaborador": "LUCIANO AURELIO SOARES", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3422", "Colaborador": "MARTA BENICE DE ALMEIDA BRIZOLA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3420", "Colaborador": "MAYLLA BRUNA ALVES RAMOS", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3474", "Colaborador": "RAFAEL MARTINS DE SOUZA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3419", "Colaborador": "ROGER TOLEDO BUENO", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3418", "Colaborador": "VERA LUCIA PEREIRA VALENTIM DA SILVA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3415", "Colaborador": "WELLINGTON FAGNER SILVA DE SOUZA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação"}, {"Matrícula": "3426", "Colaborador": "CARLOS EDUARDO DA SILVA COSTA", "Cargo": "APRENDIZ PAO DOS POBRES", "Empresa": "GA Educação LTDA", "Estabelecimento": "GA Educação CL"}]};
+const HIST_APR         = {"GA Educação LTDA": {"labels": ["04/2026"], "contrat": [17], "cota_min": [27], "pendente": [10]}, "Artmed Panamericana Editora Ltda": {"labels": ["04/2026"], "contrat": [0], "cota_min": [1], "pendente": [1]}, "MDS Cursos e Concursos Ltda": {"labels": ["04/2026"], "contrat": [0], "cota_min": [0], "pendente": [0]}, "Algetec Tecnologia Industria e Comercio": {"labels": ["04/2026"], "contrat": [0], "cota_min": [2], "pendente": [2]}, "Saber em Rede Prestação de Serviços": {"labels": ["04/2026"], "contrat": [0], "cota_min": [0], "pendente": [0]}};
+const EMPRESAS_APR     = ["Algetec Tecnologia Industria e Comercio", "Artmed Panamericana Editora Ltda", "GA Educação LTDA", "MDS Cursos e Concursos Ltda", "Saber em Rede Prestação de Serviços"];
+const COMPS_APR        = ["04/2026"];
 
 let compPcd = COMPETENCIAS[0] || '';
 let compApr = COMPS_APR[0] || '';
