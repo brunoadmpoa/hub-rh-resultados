@@ -402,8 +402,8 @@
     var wrap = document.createElementNS(ns, 'div');
     wrap.setAttribute('style',
       'font-family:Inter,Calibri,Arial,sans-serif;width:' + NW + 'px;height:' + NH + 'px;' +
-      'background:' + grad + ';border-left:4px solid ' + c.bg + ';border-radius:8px;' +
-      'box-shadow:0 2px 8px rgba(0,0,0,.10);' +
+      'background:linear-gradient(180deg,#FFFFFF 0%,#F8FAFC 100%);border-left:4px solid ' + c.bg + ';border-radius:14px;' +
+      'box-shadow:0 4px 12px rgba(0,0,0,.08);' +
       'display:flex;flex-direction:column;justify-content:center;' +
       'padding:8px 12px;box-sizing:border-box;cursor:pointer;overflow:hidden');
 
@@ -427,7 +427,7 @@
       var spanVal = data.liderados_diretos + data.liderados_indiretos;
       var dr = document.createElementNS(ns, 'div');
       dr.setAttribute('style', 'font-size:10px;color:#94A3B8;margin-top:4px');
-      dr.textContent = 'Diretos: ' + data.liderados_diretos + ' | Indiretos: ' + data.liderados_indiretos + ' | Span: ' + spanVal;
+      dr.textContent = spanVal + ' pessoas | ' + data.liderados_diretos + ' diretos | ' + data.liderados_indiretos + ' indiretos';
       wrap.appendChild(dr);
     }
 
@@ -455,6 +455,14 @@
       fo.setAttribute('x', -NW / 2);
       fo.setAttribute('y', 0);
       buildCard(fo, d.data);
+      fo.addEventListener('mouseover', function(){
+        var div = fo.querySelector('div');
+        if (div) { div.style.boxShadow = '0 12px 32px rgba(0,0,0,.32)'; div.style.transform = 'translateY(-3px)'; div.style.transition = 'box-shadow .15s, transform .15s'; }
+      });
+      fo.addEventListener('mouseleave', function(){
+        var div = fo.querySelector('div');
+        if (div) { div.style.boxShadow = '0 4px 12px rgba(0,0,0,.08)'; div.style.transform = 'translateY(0)'; }
+      });
       fo.addEventListener('click', function(){
         var panel = document.getElementById('info-panel');
         if (_lastOpenId === d.data.id && panel.classList.contains('open')) {
